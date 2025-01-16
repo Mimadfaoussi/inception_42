@@ -1,4 +1,17 @@
 services:
+  mariadb:
+    container_name: mariadb
+    build:
+      context: ./requirements/mariadb
+    env_file:
+      - .env
+    volumes:
+      - /home/mfaoussi/data/mariadb:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - inception
+
   nginx:
     container_name: nginx
     build:
