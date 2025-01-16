@@ -6,6 +6,8 @@ RUN apt-get update && apt-get install -y \
     php-mysql \
     wget \
     unzip \
+    curl \
+    mariadb-client \
     && apt-get clean
 
 # Download and set up WordPress
@@ -17,6 +19,10 @@ RUN mkdir -p /var/www/html && \
     chmod -R 755 /var/www/html && \
     rm -rf wordpress latest.tar.gz
 
+RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && \
+    chmod +x wp-cli.phar && \
+    mv wp-cli.phar /usr/local/bin/wp
+
 # Configure PHP-FPM
 RUN sed -i "s|;listen.owner = www-data|listen.owner = www-data|g" /etc/php/7.4/fpm/pool.d/www.conf && \
     sed -i "s|;listen.group = www-data|listen.group = www-data|g" /etc/php/7.4/fpm/pool.d/www.conf && \
@@ -25,8 +31,12 @@ RUN sed -i "s|;listen.owner = www-data|listen.owner = www-data|g" /etc/php/7.4/f
 # Ensure /run/php exists
 RUN mkdir -p /run/php && chown -R www-data:www-data /run/php
 
+COPY ./conf/init_wp.sh /usr/local/bin/init_wp.sh
+
+RUN chmod +x /usr/local/bin/init_wp.sh
+
 EXPOSE 9000
 
 WORKDIR /var/www/html
 
-CMD ["php-fpm7.4", "--nodaemonize"]
+CMD ["/bin/bash", "-c", "/usr/local/bin/init_wp.sh && php-fpm7.4 --nodaemonize"]
