@@ -46,5 +46,13 @@ networks:
 volumes:
   wordpress_db:
     driver: local
+    driver_opts:
+      type: none
+      device: /home/mfaoussi/data/mariadb
+      o: bind
   wordpress_files:
     driver: local
+    driver_opts:
+      type: none
+      device: /home/mfaoussi/data/wordpress
+      o: bind

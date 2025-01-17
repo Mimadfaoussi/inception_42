@@ -7,6 +7,13 @@ done
 
 echo "MariaDB is ready. Proceeding with WordPress setup..."
 
+if echo "${WORDPRESS_ADMIN_USER}" | grep -i -qE "admin|administrator"; then
+    echo "Error: WORDPRESS_ADMIN_USER contains forbidden substrings (admin, administrator)."
+    exit 1
+fi
+
+
+
 if [ ! -f /var/www/html/wp-config.php ]; then
     echo "Creating wp-config.php..."
     wp config create --path=/var/www/html \
